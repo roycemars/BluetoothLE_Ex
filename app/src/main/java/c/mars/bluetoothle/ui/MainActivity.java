@@ -1,8 +1,10 @@
 package c.mars.bluetoothle.ui;
 
+import android.Manifest;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,10 +14,12 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import c.mars.bluetoothle.R;
 import c.mars.bluetoothle.helpers.BleHelperMarshmallow;
+import c.mars.bluetoothle.helpers.PermissionsHelper;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int LOCATION_REQUEST_CODE = 1001;
     @Bind(R.id.scan)
     Button scan;
     @Bind(R.id.text)
@@ -44,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
             })
         );
 
-        bleHelper.checkAndRequestPermissions();
+//        bleHelper.checkAndRequestPermissions();
     }
 
     @OnClick(R.id.scan)
@@ -55,6 +59,23 @@ public class MainActivity extends AppCompatActivity {
         scan.setText(enable ? getString(R.string.scan) : getString(R.string.stop));
     }
 
+    @OnClick(R.id.bt)
+    void bt() {
+        PermissionsHelper.checkPermissions(this, new String[]{Manifest.permission.BLUETOOTH}, "Need Location permission");
+    }
+
+    @OnClick(R.id.bt_admin)
+    void btAdmin() {
+        PermissionsHelper.checkPermissions(this, new String[]{Manifest.permission.BLUETOOTH_ADMIN}, "Need Bluetooth Admin permission");
+    }
+
+    @OnClick(R.id.location)
+    void location() {
+//        PermissionsHelper.checkPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, "Need Location permission");
+        Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+        startActivityForResult(enableLocationIntent, LOCATION_REQUEST_CODE);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         bleHelper.onActivityResult(requestCode, resultCode, data);
@@ -63,7 +84,12 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        bleHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, s -> {
+            Timber.d("success");
+        }, e -> {
+            Timber.e("error");
+        });
+//        bleHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }

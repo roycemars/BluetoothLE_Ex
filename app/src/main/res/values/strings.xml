@@ -2,4 +2,7 @@
     <string name="app_name">BluetoothLE</string>
     <string name="scan">scan</string>
     <string name="stop">stop</string>
+    <string name="bluetooth">Bluetooth</string>
+    <string name="bt_admin">bluetooh admin</string>
+    <string name="location">location</string>
 </resources>
