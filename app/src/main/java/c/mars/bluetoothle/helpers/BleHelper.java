@@ -2,14 +2,12 @@ package c.mars.bluetoothle.helpers;
 
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import lombok.Data;
@@ -21,16 +19,13 @@ import timber.log.Timber;
  */
 @Data @RequiredArgsConstructor
 public abstract class BleHelper {
+    public static final int SCAN_PERIOD = 10;
     private static final int REQUEST_ENABLE_BT = 3001;
-
-    private final Activity activity;
+    protected final Activity activity;
     protected final ScanListener listener;
-
     protected BluetoothAdapter adapter;
-
     protected Map<BluetoothDevice, Integer> devices = new HashMap<>();
     protected boolean scanning=false;
-    public static final int SCAN_PERIOD = 10;
 
     public void init(){
         final BluetoothManager bluetoothManager = (BluetoothManager) activity.getSystemService(Context.BLUETOOTH_SERVICE);

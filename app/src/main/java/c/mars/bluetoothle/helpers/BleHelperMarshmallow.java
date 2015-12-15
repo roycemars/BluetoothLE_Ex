@@ -3,47 +3,48 @@ package c.mars.bluetoothle.helpers;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.content.pm.PackageManager;
 import android.os.Build;
 
+import rx.functions.Action1;
 import timber.log.Timber;
 
 /**
  * Created by Constantine Mars on 12/13/15.
  */
-public class BleHelperMarshmallow {
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+public class BleHelperMarshmallow extends BleHelperLollipop {
+    private static String[] permissions = new String[]{
+            Manifest.permission.BLUETOOTH,
+            Manifest.permission.BLUETOOTH_ADMIN,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
+    Action1<String[]> onError;
+    Action1<String> onSuccess;
 
-    public static void checkAndRequestPermissions(Activity activity) {
+    public BleHelperMarshmallow(Activity activity, ScanListener listener) {
+        super(activity, listener);
+
+        onError = permissions -> {
+            final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+            builder.setTitle("Functionality limited");
+            builder.setMessage("Since location access has not been granted, this app will not be able to discover BLE devices when in the background.");
+            builder.setPositiveButton(android.R.string.ok, null);
+            builder.setOnDismissListener(dialog -> {
+            });
+            builder.show();
+        };
+        onSuccess = s -> Timber.i(s);
+    }
+
+    public void checkAndRequestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            // Android M Permission check 
-            if (activity.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                builder.setTitle("This app needs location access");
-                builder.setMessage("Please grant location access so this app can detect beacons.");
-                builder.setPositiveButton(android.R.string.ok, null);
-                builder.setOnDismissListener(dialog -> activity.requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION));
-                builder.show();
-            }
+            PermissionsHelper.checkPermissions(activity,
+                    permissions,
+                    "Application needs Bluetooth Admin and Location permissions to scan for BLE devices");
         }
     }
 
-    public static void onRequestPermissionsResult(Activity activity, int requestCode, String permissions[], int[] grantResults) {
-        switch (requestCode) {
-            case PERMISSION_REQUEST_COARSE_LOCATION: {
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Timber.i("coarse location permission granted");
-                } else {
-                    final AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
-                    builder.setPositiveButton(android.R.string.ok, null);
-                    builder.setOnDismissListener(dialog -> {
-                    });
-                    builder.show();
-                }
-            }
-        }
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        PermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, onSuccess, onError);
     }
 }
