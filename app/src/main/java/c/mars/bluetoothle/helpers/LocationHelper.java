@@ -86,28 +86,7 @@ public class LocationHelper implements ResultCallback<LocationSettingsResult>, G
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
-//    protected void startLocationUpdates() {
-//        if (ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//            // TODO: Consider calling
-//            //    ActivityCompat#requestPermissions
-//            // here to request the missing permissions, and then overriding
-//            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-//            //                                          int[] grantResults)
-//            // to handle the case where the user grants the permission. See the documentation
-//            // for ActivityCompat#requestPermissions for more details.
-//            return;
-//        }
-//
-//        LocationServices.FusedLocationApi.requestLocationUpdates(
-//                mGoogleApiClient,
-//                mLocationRequest,
-//                this
-//        ).setResultCallback(status -> Timber.i("update"));
-//
-//    }
-
     private void doJob() {
-//        startLocationUpdates();
         listener.onLocationEnabled();
     }
 
