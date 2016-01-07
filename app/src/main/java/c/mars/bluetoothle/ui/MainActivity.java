@@ -14,6 +14,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import c.mars.bluetoothle.R;
 import c.mars.bluetoothle.helpers.BleHelperMarshmallow;
+import c.mars.bluetoothle.helpers.LocationHelper;
 import c.mars.bluetoothle.helpers.PermissionsHelper;
 import timber.log.Timber;
 
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     TextView text;
     boolean enable = true;
     private BleHelperMarshmallow bleHelper;
+    private LocationHelper locationHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,11 +50,36 @@ public class MainActivity extends AppCompatActivity {
             })
         );
 
-//        bleHelper.checkAndRequestPermissions();
+        locationHelper = new LocationHelper(() -> {
+            doScan();
+        }, this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        locationHelper.start();
+    }
+
+    @Override
+    protected void onStop() {
+        locationHelper.stop();
+        super.onStop();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        locationHelper.resume();
     }
 
     @OnClick(R.id.scan)
     void scan() {
+
+        locationHelper.checkLocationEnabled();
+    }
+
+    private void doScan() {
         bleHelper.scan(enable);
 
         enable = !enable;
@@ -71,25 +98,21 @@ public class MainActivity extends AppCompatActivity {
 
     @OnClick(R.id.location)
     void location() {
-//        PermissionsHelper.checkPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, "Need Location permission");
         Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         startActivityForResult(enableLocationIntent, LOCATION_REQUEST_CODE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        locationHelper.onActivityResult(requestCode, resultCode, data);
         bleHelper.onActivityResult(requestCode, resultCode, data);
         super.onActivityResult(requestCode, resultCode, data);
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        PermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, s -> {
-            Timber.d("success");
-        }, e -> {
-            Timber.e("error");
-        });
-//        bleHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        PermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, s -> Timber.d("success"), e -> Timber.e("error"));
+
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
