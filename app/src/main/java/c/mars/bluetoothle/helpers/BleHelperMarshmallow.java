@@ -36,6 +36,12 @@ public class BleHelperMarshmallow extends BleHelperLollipop {
         onSuccess = s -> Timber.i(s);
     }
 
+    @Override
+    public void scan(boolean enable) {
+        this.onSuccess = s -> super.scan(enable);
+        checkAndRequestPermissions();
+    }
+
     public void checkAndRequestPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             PermissionsHelper.checkPermissions(activity,
@@ -45,6 +51,10 @@ public class BleHelperMarshmallow extends BleHelperLollipop {
     }
 
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        PermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, onSuccess, onError);
+        PermissionsHelper.onRequestPermissionsResult(requestCode,
+                permissions,
+                grantResults,
+                onSuccess,
+                onError);
     }
 }

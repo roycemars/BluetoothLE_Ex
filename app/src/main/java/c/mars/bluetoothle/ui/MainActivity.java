@@ -111,8 +111,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        PermissionsHelper.onRequestPermissionsResult(requestCode, permissions, grantResults, s -> Timber.d("success"), e -> Timber.e("error"));
-
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        bleHelper.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 }
